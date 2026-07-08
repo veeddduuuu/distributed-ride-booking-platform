@@ -1,11 +1,11 @@
-# Distributed Ride Booking Platform (Capstone Project)
+# Distributed Ride Booking Platform
 
 ## 📌 Project Overview
 The platform simulates the core workflows of an Uber-like application, orchestrating multiple microservices to handle trip previews, ride requesting, real-time driver matching, and secure payments. 
 
 ### Core Tech Stack:
 - **Language:** Go (1.26+)
-- **Database:** PostgreSQL (with BSON mapping)
+- **Database:** PostgreSQL
 - **Message Broker:** RabbitMQ (for event-driven communication)
 - **APIs & Protocols:** HTTP/REST, gRPC, WebSockets (for real-time updates)
 - **Telemetry:** OpenTelemetry & Jaeger (Distributed Tracing)
