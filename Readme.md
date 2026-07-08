@@ -5,7 +5,7 @@ The platform simulates the core workflows of an Uber-like application, orchestra
 
 ### Core Tech Stack:
 - **Language:** Go (1.26+)
-- **Database:** MongoDB (with BSON mapping)
+- **Database:** PostgreSQL (with BSON mapping)
 - **Message Broker:** RabbitMQ (for event-driven communication)
 - **APIs & Protocols:** HTTP/REST, gRPC, WebSockets (for real-time updates)
 - **Telemetry:** OpenTelemetry & Jaeger (Distributed Tracing)
