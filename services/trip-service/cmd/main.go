@@ -2,9 +2,9 @@ package main
 
 import (
 	"context"
-	"go-ride-platform/services/trip-service/internal/domain"
-	"go-ride-platform/services/trip-service/internal/infrastructure/repository"
-	"go-ride-platform/services/trip-service/internal/service"
+	"github.com/veeddduuuu/distributed-ride-booking-platform/services/trip-service/internal/domain"
+	"github.com/veeddduuuu/distributed-ride-booking-platform/services/trip-service/internal/infrastructure/repository"
+	"github.com/veeddduuuu/distributed-ride-booking-platform/services/trip-service/internal/service"
 	"log"
 )
 

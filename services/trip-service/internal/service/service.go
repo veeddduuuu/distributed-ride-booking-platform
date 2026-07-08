@@ -2,7 +2,7 @@ package service
 
 import (
 	"context"
-	"go-ride-platform/services/trip-service/internal/domain"
+	"github.com/veeddduuuu/distributed-ride-booking-platform/services/trip-service/internal/domain"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
