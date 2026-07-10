@@ -13,7 +13,7 @@ func main() {
 		w.Write([]byte("Welcome to the API Gateway!"))
 	})
 
-	mux.HandleFunc("POST /trip-preview", handleTripPreview)
+	mux.HandleFunc("POST /trip/preview", handleTripPreview)
 
 	if err := http.ListenAndServe(":8080", mux); err != nil {
 		fmt.Printf("Error starting server: %v\n", err)

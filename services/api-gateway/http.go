@@ -27,5 +27,13 @@ func handleTripPreview(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	fmt.Println("Received trip preview request:", reqBody)
-	writeJson(w, http.StatusOK, "Trip preview request received successfully")
+	
+	resp, err := http.Post("http://localhost:8083/preview", "application/json", r.Body)
+	if err != nil {
+		http.Error(w, "Error forwarding request", http.StatusInternalServerError)
+		return
+	}
+	defer resp.Body.Close()
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(resp.Body)
 }
