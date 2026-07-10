@@ -7,3 +7,10 @@ k8s_resource('api-gateway', port_forwards=8080)
 docker_build('trip-service', '.', dockerfile='services/trip-service/Dockerfile')
 k8s_yaml('k8s/trip-service.yaml')
 k8s_resource('trip-service', port_forwards=8083)
+
+# --- Web Frontend Configuration ---
+# Self-contained build context (services/web), unlike the Go services which
+# build from the repo root to reach go.mod/shared.
+docker_build('web', 'services/web', dockerfile='services/web/Dockerfile')
+k8s_yaml('k8s/web.yaml')
+k8s_resource('web', port_forwards='3000:80')
