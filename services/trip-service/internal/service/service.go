@@ -39,8 +39,8 @@ func (s *Service) CreateTrip(ctx context.Context, fare domain.RideFareModel) (*d
 	return &createdTrip, nil
 }
 
-func (s *Service) GetRoute(ctx context.Context, pickup, destination *types.Coordinates) (*types.OSRMResponse, error) {
-	url := fmt.Sprintf("http://router.project-osrm.org/route/v1/driving/%f,%f;%f,%f", pickup.Longitude, pickup.Latitude, destination.Longitude, destination.Latitude)
+func (s *Service) GetRoute(ctx context.Context, pickup, destination *types.Coordinates) (*types.Route, error) {
+	url := fmt.Sprintf("http://router.project-osrm.org/route/v1/driving/%f,%f;%f,%f?overview=full", pickup.Longitude, pickup.Latitude, destination.Longitude, destination.Latitude)
 	resp, err := http.Get(url)
 	if err != nil {
 		return nil, fmt.Errorf("Failed to get route from OSRM: %v", err)
@@ -55,5 +55,15 @@ func (s *Service) GetRoute(ctx context.Context, pickup, destination *types.Coord
 		return nil, fmt.Errorf("Failed to parse the response %v", err)
 	}
 
-	return &osrmResp, nil
+	if len(osrmResp.Routes) == 0 {
+		return nil, fmt.Errorf("No route found")
+	}
+
+	route := &types.Route{
+		Distance: osrmResp.Routes[0].Distance,
+		Duration: osrmResp.Routes[0].Duration,
+		Polyline: osrmResp.Routes[0].Polyline,
+	}
+
+	return route, nil
 }
