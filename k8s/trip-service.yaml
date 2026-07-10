@@ -1,32 +1,32 @@
-apiVersion : api/v1
-kind : Deployment
+apiVersion: apps/v1
+kind: Deployment
 metadata:
-  name : trip-service
+  name: trip-service
   labels:
-    app : trip-service
-  spec:
-    replicas : 1
-    selector:
-      matchLabels:
-        app : trip-service
-    template:
-      metadata:
-        labels:
-          app : trip-service
-      spec:
-        containers:
-          - name : trip-service
-            image : trip-service:latest
-            ports:
-              - containerPort : 8083
+    app: trip-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: trip-service
+  template:
+    metadata:
+      labels:
+        app: trip-service
+    spec:
+      containers:
+        - name: trip-service
+          image: trip-service:latest
+          ports:
+            - containerPort: 8083
 ---
-apiVersion : v1
-kind : Service
+apiVersion: v1
+kind: Service
 metadata:
-  name : trip-service
+  name: trip-service
 spec:
   selector:
-    app : trip-service
+    app: trip-service
   ports:
-    - port : 8083
-      targetPort : 8083
+    - port: 8083
+      targetPort: 8083
