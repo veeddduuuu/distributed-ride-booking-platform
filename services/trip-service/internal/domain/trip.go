@@ -3,8 +3,9 @@ package domain
 import (
 	"context"
 
+	"github.com/veeddduuuu/distributed-ride-booking-platform/shared/types"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-)
+)	
 
 type RideFareModel struct {
 	ID          primitive.ObjectID
@@ -26,4 +27,5 @@ type TripRepository interface {
 
 type TripService interface {
 	CreateTrip(ctx context.Context, fare *RideFareModel) (*TripModel, error)
+	GetRoute(ctx context.Context, pickup, destination *types.Coordinates) (*types.OSRMResponse, error)
 }

@@ -27,7 +27,7 @@ func main() {
 			return
 		}
 		
-		tripResponse, err := svc.CreateTrip(r.Context(), &fare)
+		tripResponse, err := svc.CreateTrip(r.Context(), fare)
 		if err != nil {
 			http.Error(w, "Error creating trip", http.StatusInternalServerError)
 			return

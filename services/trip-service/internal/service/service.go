@@ -2,9 +2,15 @@ package service
 
 import (
 	"context"
+	"fmt"
+
 	"github.com/veeddduuuu/distributed-ride-booking-platform/services/trip-service/internal/domain"
+	"github.com/veeddduuuu/distributed-ride-booking-platform/shared/types"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"encoding/json"
+	"io"
+	"net/http"
 )
 
 type Service struct {
@@ -30,4 +36,23 @@ func (s *Service) CreateTrip(ctx context.Context, fare domain.RideFareModel) (*d
 		return nil, err
 	}
 	return &createdTrip, nil
+}
+
+func (s *Service) GetRoute(ctx context.Context, pickup, destination *types.Coordinates) (*types.OSRMResponse, error) {
+	url:=fmt.Sprintf("http://router.project-osrm.org/route/v1/driving/%f,%f;%f,%f?overview=true", pickup.Longitude, pickup.Latitude, destination.Longitude, destination.Latitude)
+	resp, err := http.Get(url)
+	if err != nil {
+		return nil, fmt.Errorf("Failed to get route from OSRM: %v", err)
+	}
+	defer resp.Body.Close()
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("Failed to read the response %v", err)
+	}
+	var osrmResp types.OSRMResponse
+	if err := json.Unmarshal(body, &osrmResp); err != nil {
+		return nil, fmt.Errorf("Failed to parse the response %v", err)
+	}
+	
+	return &osrmResp, nil
 }
