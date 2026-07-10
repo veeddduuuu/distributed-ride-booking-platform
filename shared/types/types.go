@@ -17,6 +17,6 @@ type OSRMResponse struct {
 	Routes []struct {
 		Distance float64 `json:"distance"`
 		Duration float64 `json:"duration"`
-		Polyline string  `json:"polyline"`
+		Polyline string  `json:"geometry"`
 	} `json:"routes"`
 }

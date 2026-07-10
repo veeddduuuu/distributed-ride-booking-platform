@@ -4,6 +4,7 @@ WORKDIR /app
 COPY go.sum go.mod ./
 RUN go mod download
 
+COPY shared ./shared
 COPY services/trip-service ./services/trip-service
 
 # Tell Docker to change directory to where main.go is!
