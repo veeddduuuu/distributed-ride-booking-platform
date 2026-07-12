@@ -1,8 +1,13 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
 )
 
 func main() {
@@ -14,8 +19,30 @@ func main() {
 	})
 
 	mux.HandleFunc("POST /trip/preview", handleTripPreview)
+	
+	server := &http.Server{
+		Addr:    ":8080",
+		Handler: mux,
+	}
 
-	if err := http.ListenAndServe(":8080", mux); err != nil {
+	serverErrors := make(chan error, 1)
+	go func() {
+		serverErrors <- server.ListenAndServe()
+	}()
+
+	shutdown := make(chan os.Signal, 1)
+	signal.Notify(shutdown, os.Interrupt, syscall.SIGTERM)
+
+	select {
+	case err := <-serverErrors:
 		fmt.Printf("Error starting server: %v\n", err)
+	case sig := <-shutdown:
+		fmt.Printf("Received shutdown signal: %v\n", sig)
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
+		if err := server.Shutdown(ctx); err != nil {
+			fmt.Printf("Error shutting down server gracefully: %v\n", err)
+			server.Close()
+		}
 	}
 }
