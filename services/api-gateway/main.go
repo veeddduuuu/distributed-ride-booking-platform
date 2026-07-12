@@ -19,8 +19,8 @@ func main() {
 	})
 
 	mux.HandleFunc("POST /trip/preview", handleTripPreview)
-	mux.HandleFunc("POST /ws/rider", handleRiderWebSocket)
-	mux.HandleFunc("POST /ws/driver", handleDriverWebSocket)
+	mux.HandleFunc("/ws/rider", handleRiderWebSocket)
+	mux.HandleFunc("/ws/driver", handleDriverWebSocket)
 
 	server := &http.Server{
 		Addr:    ":8080",
