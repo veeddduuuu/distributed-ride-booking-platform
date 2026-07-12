@@ -20,3 +20,8 @@ type OSRMResponse struct {
 		Polyline string  `json:"geometry"`
 	} `json:"routes"`
 }
+
+type WSMessage struct {
+	Type string `json:"type"`
+	Data any `json:"payload"`
+}
