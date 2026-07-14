@@ -5,7 +5,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
+
+	"github.com/veeddduuuu/distributed-ride-booking-platform/services/api-gateway/grpc_clients"
 )
 
 func handleTripPreview(w http.ResponseWriter, r *http.Request) {
@@ -30,12 +33,17 @@ func handleTripPreview(w http.ResponseWriter, r *http.Request) {
 	}
 	fmt.Println("Received trip preview request:", reqBody)
 	
-	// r.Body was exhausted when we read it above, so we need to re-encode it
 	bodyBytes, _ := json.Marshal(reqBody)
 	importBytes := bytes.NewBuffer(bodyBytes)
 	
-	// In Kubernetes, localhost refers to the container itself.
-	// To talk to another microservice, we use its Kubernetes Service name!
+	tripservice, err := grpc_clients.NewTripServiceClient()
+	if err!=nil{
+		log.Fatal(err)
+	}
+
+	defer tripservice.Close()
+
+
 	resp, err := http.Post("http://trip-service:8083/preview", "application/json", importBytes)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Error forwarding request: %v", err), http.StatusInternalServerError)
@@ -43,12 +51,10 @@ func handleTripPreview(w http.ResponseWriter, r *http.Request) {
 	}
 	defer resp.Body.Close()
 	
-	// Copy the headers from the trip-service response
 	for k, v := range resp.Header {
 		w.Header()[k] = v
 	}
 	w.WriteHeader(resp.StatusCode)
 	
-	// Copy the body directly to the client
 	io.Copy(w, resp.Body)
 }
