@@ -11,7 +11,7 @@ type TripServiceClient struct {
 }
 
 func NewTripServiceClient() (*TripServiceClient, error)  {
-	tripServiceUrl:="trip-service:9093"
+	tripServiceUrl := "localhost:9093"
 	
 	conn, err := grpc.NewClient(tripServiceUrl)
 	if err!=nil{

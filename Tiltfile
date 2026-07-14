@@ -1,16 +1,15 @@
 # --- API Gateway Configuration ---
-docker_build('api-gateway', '.', dockerfile='services/api-gateway/Dockerfile')
-k8s_yaml('k8s/api-gateway.yaml')
-k8s_resource('api-gateway', port_forwards=8080)
+local_resource('api-gateway', 
+               cmd='go run ./services/api-gateway', 
+               deps=['services/api-gateway', 'shared'])
 
 # --- Trip Service Configuration ---
-docker_build('trip-service', '.', dockerfile='services/trip-service/Dockerfile')
-k8s_yaml('k8s/trip-service.yaml')
-k8s_resource('trip-service', port_forwards=8083)
+local_resource('trip-service', 
+               cmd='go run ./services/trip-service/cmd/main.go', 
+               deps=['services/trip-service', 'shared'])
 
 # --- Web Frontend Configuration ---
-# Self-contained build context (services/web), unlike the Go services which
-# build from the repo root to reach go.mod/shared.
-docker_build('web', 'services/web', dockerfile='services/web/Dockerfile')
-k8s_yaml('k8s/web.yaml')
-k8s_resource('web', port_forwards='3000:80')
+local_resource('web', 
+               cmd='npm run dev', 
+               dir='services/web', 
+               deps=['services/web/src', 'services/web/package.json', 'services/web/vite.config.ts'])

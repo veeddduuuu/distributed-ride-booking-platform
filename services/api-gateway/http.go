@@ -44,7 +44,7 @@ func handleTripPreview(w http.ResponseWriter, r *http.Request) {
 	defer tripservice.Close()
 
 
-	resp, err := http.Post("http://trip-service:8083/preview", "application/json", importBytes)
+	resp, err := http.Post("http://localhost:8083/preview", "application/json", importBytes)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Error forwarding request: %v", err), http.StatusInternalServerError)
 		return

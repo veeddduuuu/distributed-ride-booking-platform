@@ -1,18 +1,21 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"log"
+	"net"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
-	"context"
+
 	"github.com/veeddduuuu/distributed-ride-booking-platform/services/trip-service/internal/infrastructure/repository"
 	"github.com/veeddduuuu/distributed-ride-booking-platform/services/trip-service/internal/service"
 	"github.com/veeddduuuu/distributed-ride-booking-platform/shared/types"
+	grpcserver "google.golang.org/grpc"
 )
 
 type PreviewRequest struct {
@@ -20,57 +23,39 @@ type PreviewRequest struct {
 	Destination types.Coordinates `json:"destination"`
 }
 
+var grpcAddr = ":9093"
+
 func main() {
-	inmemRepo := repository.NewInmemRepository()
-	svc := service.NewService(inmemRepo)
-	mux := http.NewServeMux()
+	// inmemrepo := repository.NewInmemRepository()
+	// svc := service.NewService(inmemrepo)
 
-	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("Welcome to the Trip Service!"))
-	})
+	ctx, cancel := context.WithCancel(context.Background())
 
-	mux.HandleFunc("POST /preview", func(w http.ResponseWriter, r *http.Request) {
-		var req PreviewRequest
-		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			http.Error(w, "Invalid request body", http.StatusBadRequest)
-			return
-		}
-
-		tripResponse, err := svc.GetRoute(r.Context(), &req.Pickup, &req.Destination)
-		if err != nil {
-			http.Error(w, "Error creating trip", http.StatusInternalServerError)
-			return
-		}
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(tripResponse)
-	})
-	fmt.Println("Starting Trip Service at port 8083...")
-
-	server:= &http.Server{
-		Addr:   ":8083",
-		Handler: mux,
-	}
-
-	serverErrors := make(chan error, 1)
-
-	go func(){
-		serverErrors <- server.ListenAndServe()
+	go func() {
+		sigCh := make(chan os.Signal, 1)
+		signal.Notify(sigCh, os.Interrupt, syscall.SIGTERM) 
+		<- sigCh
+		cancel()
 	}()
 
-	shutdown := make(chan os.Signal, 1)
-	signal.Notify(shutdown, os.Interrupt, syscall.SIGTERM)
-
-	select {
-	case err:= <-serverErrors:
-		log.Printf("Error starting server: %v\n", err)
-	case err:= <-shutdown:
-		log.Printf("Received shutdown signal: %v\n", err)
-		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-		defer cancel()
-		if err := server.Shutdown(ctx); err != nil {
-			log.Printf("Error shutting down server gracefully: %v\n", err)
-			server.Close()
-		}
+	lis, err := net.Listen("tcp", grpcAddr)
+	if err!=nil{
+		log.Fatalf("failed to listen: %v", err)
 	}
+
+	grpcserver := grpcserver.NewServer()
+	
+	log.Printf("Starting gRPC server Trip service on port %s", lis.Addr().String())
+
+	go func() {
+		if err:= grpcserver.Serve(lis); err!=nil{
+			log.Printf("failed to serve: %v", err)
+			cancel()
+		}
+	}()
+
+	<-ctx.Done()
+	log.Printf("shutting down the server....")
+	grpcserver.GracefulStop()
+
 }
