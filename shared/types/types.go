@@ -39,3 +39,7 @@ type PreviewTripResponse struct {
 	RideFares     []*RideShare           `protobuf:"bytes,3,rep,name=rideFares,proto3" json:"rideFares,omitempty"`
 }
 
+type TripStartResponse struct{
+	RideDetails *RideShare
+	Success bool
+}

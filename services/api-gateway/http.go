@@ -67,9 +67,9 @@ func handleTripPreview(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(resp)
 }
 
-func handleTripStart(w http.ResponseWriter, r *http.Request){
+func handleTripStart(w http.ResponseWriter, r *http.Request) {
 	var reqBody pb.RideShare
-	
+
 	if err := json.NewDecoder(r.Body).Decode(&reqBody); err != nil {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
@@ -79,7 +79,6 @@ func handleTripStart(w http.ResponseWriter, r *http.Request){
 	// userId := reqBody.UserId
 	// packageSlug := reqBody.PackageSlug
 	// fare := reqBody.Fare
-	
 
 	fmt.Println("Received trip start request, starting your trip with :", reqBody)
 
@@ -92,10 +91,21 @@ func handleTripStart(w http.ResponseWriter, r *http.Request){
 
 	defer tripservice.Close()
 
-	//resp, err :=
+	resp, err := tripservice.Client.TripStart(r.Context(), &pb.TripStartRequest{
+		RideDetails: &pb.RideShare{
+			Id:          reqBody.Id,
+			UserId:      reqBody.UserId,
+			PackageSlug: reqBody.PackageSlug,
+			TotalPrice:  reqBody.TotalPrice,
+		},
+	})
+
+	if err != nil {
+		log.Printf("StartTrip grpc call failed %v", err)
+		http.Error(w, "StartTrip grpc call failed", http.StatusServiceUnavailable)
+	}
 
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(r.Response.StatusCode)
-	//json.NewEncoder(w).Encode(resp) 
-	
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(resp)
 }
