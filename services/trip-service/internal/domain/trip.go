@@ -27,7 +27,7 @@ type TripRepository interface {
 }
 
 type TripService interface {
-	CreateTrip(ctx context.Context, fare *RideFareModel) (*TripModel, error)
+	CreateTrip(ctx context.Context, fare RideFareModel) (*TripModel, error)
 	GetRoute(ctx context.Context, pickup, destination *types.Coordinates) (*types.Route, error)
 	GetFares(userId string, Distance float64) ([] *types.RideShare, error)
 	PreviewTrip(ctx context.Context, userId string, pickup *types.Coordinates, destination *types.Coordinates) (*types.PreviewTripResponse,error)

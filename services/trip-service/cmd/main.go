@@ -6,15 +6,19 @@ import (
 	// "fmt"
 	"log"
 	"net"
+
 	// "net/http"
 	"os"
 	"os/signal"
 	"syscall"
+
 	// "time"
 
-	// "github.com/veeddduuuu/distributed-ride-booking-platform/services/trip-service/internal/infrastructure/repository"
-	// "github.com/veeddduuuu/distributed-ride-booking-platform/services/trip-service/internal/service"
+	"github.com/veeddduuuu/distributed-ride-booking-platform/services/trip-service/internal/infrastructure/grpc"
+	"github.com/veeddduuuu/distributed-ride-booking-platform/services/trip-service/internal/infrastructure/repository"
+	"github.com/veeddduuuu/distributed-ride-booking-platform/services/trip-service/internal/service"
 	"github.com/veeddduuuu/distributed-ride-booking-platform/shared/types"
+	pb "github.com/veeddduuuu/distributed-ride-booking-platform/shared/proto/trip"
 	grpcserver "google.golang.org/grpc"
 )
 
@@ -26,8 +30,8 @@ type PreviewRequest struct {
 var grpcAddr = ":9093"
 
 func main() {
-	// inmemrepo := repository.NewInmemRepository()
-	// svc := service.NewService(inmemrepo)
+	inmemrepo := repository.NewInmemRepository()
+	svc := service.NewService(inmemrepo)
 
 	ctx, cancel := context.WithCancel(context.Background())
 
@@ -43,12 +47,14 @@ func main() {
 		log.Fatalf("failed to listen: %v", err)
 	}
 
-	grpcserver := grpcserver.NewServer()
+	grpcServer := grpcserver.NewServer()
+	handler := grpc.NewTripServiceHandler(svc)       // 1. create the handler
+	pb.RegisterTripServiceServer(grpcServer, handler) // 2. register it so the server can route calls to it
 	
 	log.Printf("Starting gRPC server Trip service on port %s", lis.Addr().String())
 
 	go func() {
-		if err:= grpcserver.Serve(lis); err!=nil{
+		if err := grpcServer.Serve(lis); err != nil {
 			log.Printf("failed to serve: %v", err)
 			cancel()
 		}
@@ -56,6 +62,6 @@ func main() {
 
 	<-ctx.Done()
 	log.Printf("shutting down the server....")
-	grpcserver.GracefulStop()
+	grpcServer.GracefulStop()
 
 }
