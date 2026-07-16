@@ -1,105 +1,158 @@
-import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import '../App.css';
 import MapView from '../components/MapView';
 import { useTrip } from '../hooks/useTrip';
 import { useRiderWebSocket } from '../hooks/useRiderWebSocket';
-import { Link } from 'react-router-dom';
-
-const RIDES = [
-  { id: 'suv', name: 'SUV', desc: 'Spacious ride for groups', icon: '🚐' },
-  { id: 'sedan', name: 'Sedan', desc: 'Economic and comfortable', icon: '🚗' },
-  { id: 'van', name: 'Van', desc: 'Perfect for larger groups', icon: '🚌' },
-  { id: 'luxury', name: 'Luxury', desc: 'Premium experience', icon: '👑' },
-];
+import FareList from '../components/FareList';
+import TripSummaryBar from '../components/TripSummaryBar';
+import StatusBadge from '../components/StatusBadge';
+import Button from '../components/Button';
 
 // Generate a random ID for this session
 const RIDER_ID = 'rider_' + Math.random().toString(36).substr(2, 9);
 
 export function RiderPage() {
-  const { pickup, destination, route, handleSetPickup } = useTrip();
+  const { 
+    pickup, 
+    destination, 
+    route, 
+    tripPreview, 
+    selectedFare, 
+    isLoading,
+    error,
+    handleMapClick, 
+    selectFare 
+  } = useTrip();
+  
   const { isConnected, sendRideRequest } = useRiderWebSocket(RIDER_ID);
-  const [selectedRide, setSelectedRide] = useState<string | null>(null);
 
   const handleRequestRide = () => {
-    if (pickup && destination && selectedRide) {
+    if (pickup && destination && selectedFare) {
       sendRideRequest({
         pickup,
         destination,
-        packageSlug: selectedRide,
+        packageSlug: selectedFare.packageSlug,
       });
-      alert('Ride request sent to backend via WebSocket!');
-    } else {
-      alert('Please select pickup, destination, and ride type.');
+      // Simple visual feedback for now
+      const btn = document.getElementById('request-btn');
+      if (btn) {
+        btn.innerText = 'Request Sent!';
+        setTimeout(() => (btn.innerText = 'Request Ride'), 2000);
+      }
     }
+  };
+
+  const renderSidebarContent = () => {
+    if (!pickup) {
+      return (
+        <div className="sidebar-prompt">
+          <div className="sidebar-prompt-icon">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} width={24}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+          </div>
+          <p className="sidebar-prompt-text">Tap anywhere on the map to set your pickup location</p>
+        </div>
+      );
+    }
+
+    if (!destination) {
+      return (
+        <div className="sidebar-prompt">
+          <div className="sidebar-prompt-icon">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} width={24}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v8l9-11h-7z" />
+            </svg>
+          </div>
+          <p className="sidebar-prompt-text">Now tap to set your destination</p>
+        </div>
+      );
+    }
+
+    if (isLoading) {
+      return (
+        <div style={{ marginTop: '20px' }}>
+          <div className="skeleton skeleton-summary" />
+          <div className="skeleton skeleton-fare" />
+          <div className="skeleton skeleton-fare" />
+          <div className="skeleton skeleton-fare" />
+          <div className="skeleton skeleton-fare" />
+        </div>
+      );
+    }
+
+    if (error) {
+      return (
+        <div className="sidebar-prompt" style={{ color: 'var(--color-danger)' }}>
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} width={32} style={{ marginBottom: 12 }}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <p>{error}</p>
+        </div>
+      );
+    }
+
+    if (tripPreview) {
+      return (
+        <div style={{ marginTop: '20px' }}>
+          <TripSummaryBar 
+            distance={tripPreview.route.distance} 
+            duration={tripPreview.route.duration} 
+          />
+          <FareList 
+            fares={tripPreview.rideFares} 
+            selectedFare={selectedFare}
+            onSelectFare={selectFare}
+          />
+        </div>
+      );
+    }
+
+    return null;
   };
 
   return (
     <div className="app-container">
+      <div className="sidebar">
+        <div className="sidebar-inner">
+          <div className="sidebar-header">
+            <h2>Book a Ride</h2>
+            <StatusBadge connected={isConnected} />
+          </div>
+          
+          {renderSidebarContent()}
+
+          <div className="sidebar-footer">
+            {tripPreview && (
+              <Button 
+                id="request-btn"
+                variant="primary" 
+                full 
+                onClick={handleRequestRide}
+                disabled={!selectedFare || !isConnected}
+              >
+                {!isConnected 
+                  ? 'Connecting...' 
+                  : !selectedFare 
+                    ? 'Select a ride' 
+                    : `Request ${selectedFare.packageSlug} • ₹${selectedFare.totalPrice.toFixed(0)}`}
+              </Button>
+            )}
+            <Link to="/" style={{ textDecoration: 'none' }}>
+              <Button variant="ghost" full>Back to Home</Button>
+            </Link>
+          </div>
+        </div>
+      </div>
+
       <div className="map-container">
         <MapView 
           pickup={pickup} 
           destination={destination} 
           route={route} 
-          onMapClick={(lat, lng) => handleSetPickup({ latitude: lat, longitude: lng })} 
+          onMapClick={(lat, lng) => handleMapClick({ latitude: lat, longitude: lng })} 
         />
-      </div>
-      
-      <div className="sidebar">
-        <div className="card">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <h2>Select your desired ride</h2>
-            <div title="WebSocket Status">
-               {isConnected ? '🟢 Connected' : '🔴 Disconnected'}
-            </div>
-          </div>
-          
-          <div className="route-info">
-            <p className="routing-text">
-              {route ? `Routing for ${(route.distance / 1000).toFixed(2)} km` : 'Select pickup and destination on the map'}
-            </p>
-            {route && (
-              <p className="time-text">
-                <span className="clock-icon">🕒</span> You'll arrive in: {Math.round(route.duration / 60)} minutes
-              </p>
-            )}
-          </div>
-
-          <div className="ride-list">
-            {RIDES.map((ride) => (
-              <div 
-                key={ride.id} 
-                className={`ride-item ${selectedRide === ride.id ? 'selected' : ''}`}
-                onClick={() => setSelectedRide(ride.id)}
-                style={{
-                  cursor: 'pointer',
-                  border: selectedRide === ride.id ? '2px solid #000' : '2px solid transparent',
-                  borderRadius: '12px',
-                  padding: '12px'
-                }}
-              >
-                <div className="ride-icon">{ride.icon}</div>
-                <div className="ride-details">
-                  <span className="ride-name">{ride.name}</span>
-                  <span className="ride-desc">{ride.desc}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
-            <button 
-              className="back-button" 
-              style={{ flex: 1, backgroundColor: '#000', color: '#fff' }}
-              onClick={handleRequestRide}
-              disabled={!pickup || !destination || !selectedRide}
-            >
-              Request Ride
-            </button>
-            <Link to="/" className="back-button" style={{ flex: 1, textDecoration: 'none', textAlign: 'center' }}>
-              Home
-            </Link>
-          </div>
-        </div>
       </div>
     </div>
   );

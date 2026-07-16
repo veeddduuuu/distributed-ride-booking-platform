@@ -1,16 +1,17 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import '../App.css';
 import MapView from '../components/MapView';
 import { useDriverWebSocket } from '../hooks/useDriverWebSocket';
-import { Link } from 'react-router-dom';
+import StatusBadge from '../components/StatusBadge';
+import Button from '../components/Button';
 
 const DRIVER_ID = 'driver_' + Math.random().toString(36).substr(2, 9);
 
 export function DriverPage() {
-  const [packageSlug, setPackageSlug] = useState('premium');
+  const [packageSlug, setPackageSlug] = useState('sedan');
   const [shouldConnect, setShouldConnect] = useState(false);
   
-  // Only connect if the user hits "Connect"
   const activeSlug = shouldConnect ? packageSlug : '';
   const { isConnected, driverInfo, availableRides } = useDriverWebSocket(
     shouldConnect ? DRIVER_ID : '', 
@@ -19,111 +20,101 @@ export function DriverPage() {
 
   return (
     <div className="app-container">
-      <div className="map-container">
-        {/* Simple map centered on a default location, can be enhanced with driver location later */}
-        <MapView 
-          pickup={null} 
-          destination={null} 
-          route={null} 
-          onMapClick={() => {}} 
-        />
-      </div>
-      
       <div className="sidebar">
-        <div className="card">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <h2>Driver Dashboard</h2>
-            <div title="WebSocket Status">
-               {isConnected ? '🟢 Connected' : '🔴 Disconnected'}
-            </div>
+        <div className="sidebar-inner">
+          <div className="sidebar-header">
+            <h2>Driver App</h2>
+            <StatusBadge connected={isConnected} />
           </div>
 
           {!isConnected ? (
-            <div style={{ marginTop: '2rem' }}>
-              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>
-                Select Package:
-              </label>
-              <select 
-                value={packageSlug}
-                onChange={(e) => setPackageSlug(e.target.value)}
-                style={{ width: '100%', padding: '0.8rem', borderRadius: '8px', marginBottom: '1rem', border: '1px solid #ccc' }}
-              >
-                <option value="premium">Premium 👑</option>
-                <option value="suv">SUV 🚐</option>
-                <option value="sedan">Sedan 🚗</option>
-                <option value="van">Van 🚌</option>
-              </select>
+            <div className="driver-section">
+              <div className="select-wrapper">
+                <label>Vehicle Class</label>
+                <select 
+                  value={packageSlug}
+                  onChange={(e) => setPackageSlug(e.target.value)}
+                >
+                  <option value="sedan">Sedan (Standard)</option>
+                  <option value="suv">SUV (6 Seats)</option>
+                  <option value="van">Van (8+ Seats)</option>
+                  <option value="luxury">Luxury (Premium)</option>
+                </select>
+              </div>
 
-              <button 
-                className="back-button" 
-                style={{ width: '100%', backgroundColor: '#000', color: '#fff', marginTop: '1rem' }}
+              <Button 
+                variant="primary" 
+                full 
                 onClick={() => setShouldConnect(true)}
+                style={{ marginTop: 8 }}
               >
                 Go Online
-              </button>
+              </Button>
             </div>
           ) : (
             <>
               {driverInfo && (
-                <div style={{ 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  gap: '1rem', 
-                  marginTop: '1.5rem', 
-                  padding: '1rem', 
-                  backgroundColor: '#f8f9fa', 
-                  borderRadius: '12px' 
-                }}>
-                  <div style={{ 
-                    width: '60px', 
-                    height: '60px', 
-                    borderRadius: '50%', 
-                    backgroundColor: '#ccc',
-                    backgroundImage: `url(${driverInfo.profilePicture})`,
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center'
-                  }} />
+                <div className="driver-profile">
+                  <div 
+                    className="driver-avatar"
+                    style={{ backgroundImage: `url(${driverInfo.profilePicture || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + driverInfo.name})` }} 
+                  />
                   <div>
-                    <h3 style={{ margin: 0 }}>{driverInfo.name}</h3>
-                    <p style={{ margin: '0.2rem 0', color: '#666' }}>{driverInfo.carNumber} • {driverInfo.packageSlug}</p>
+                    <h3 className="driver-name">{driverInfo.name}</h3>
+                    <p className="driver-meta">{driverInfo.carNumber} • {driverInfo.packageSlug.toUpperCase()}</p>
                   </div>
                 </div>
               )}
 
-              <div style={{ marginTop: '2rem' }}>
-                <h3>Available Rides</h3>
+              <div className="driver-section">
+                <h3>Incoming Requests</h3>
                 {availableRides.length === 0 ? (
-                  <p style={{ color: '#666', fontStyle: 'italic', padding: '1rem 0' }}>
-                    Listening for new ride requests...
-                  </p>
+                  <div className="driver-rides-empty">
+                    Waiting for nearby requests...
+                  </div>
                 ) : (
-                  <div className="ride-list" style={{ marginTop: '1rem' }}>
+                  <div className="fare-list" style={{ marginTop: 12 }}>
                     {availableRides.map((ride, idx) => (
-                      <div key={idx} className="ride-item" style={{ padding: '1rem', border: '1px solid #eaeaea', borderRadius: '12px' }}>
-                        <div><strong>Pickup:</strong> {ride.pickup?.latitude}, {ride.pickup?.longitude}</div>
-                        <div><strong>Dest:</strong> {ride.destination?.latitude}, {ride.destination?.longitude}</div>
+                      <div key={idx} className="driver-ride-item">
+                        <div style={{ marginBottom: 4 }}>
+                          <strong>Pickup:</strong> {ride.pickup?.latitude.toFixed(4)}, {ride.pickup?.longitude.toFixed(4)}
+                        </div>
+                        <div>
+                          <strong>Drop:</strong> {ride.destination?.latitude.toFixed(4)}, {ride.destination?.longitude.toFixed(4)}
+                        </div>
                       </div>
                     ))}
                   </div>
                 )}
               </div>
 
-              <button 
-                className="back-button" 
-                style={{ width: '100%', marginTop: '1rem' }}
-                onClick={() => setShouldConnect(false)}
-              >
-                Go Offline
-              </button>
+              <div style={{ marginTop: 'auto', paddingTop: 24 }}>
+                <Button 
+                  variant="secondary" 
+                  full 
+                  onClick={() => setShouldConnect(false)}
+                >
+                  Go Offline
+                </Button>
+              </div>
             </>
           )}
 
-          <div style={{ marginTop: '1rem' }}>
-            <Link to="/" className="back-button" style={{ display: 'block', textDecoration: 'none', textAlign: 'center' }}>
-              Home
+          <div className="sidebar-footer">
+            <Link to="/" style={{ textDecoration: 'none' }}>
+              <Button variant="ghost" full>Back to Home</Button>
             </Link>
           </div>
         </div>
+      </div>
+      
+      <div className="map-container">
+        <MapView 
+          pickup={null} 
+          destination={null} 
+          route={null} 
+          onMapClick={() => {}} 
+        />
       </div>
     </div>
   );
