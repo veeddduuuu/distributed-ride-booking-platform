@@ -6,6 +6,7 @@ option go_package = "shared/proto/trip;trip";
 
 service TripService{
     rpc PreviewTrip(PreviewTripRequest) returns (PreviewTripResponse);
+    rpc TripStart(TripStartRequest) returns (TripStartResponse);
 }
 
 message PreviewTripRequest {
@@ -18,6 +19,15 @@ message PreviewTripResponse {
     string tripId = 1;
     Route route = 2;
     repeated RideShare rideFares = 3;
+}
+
+message TripStartRequest {
+    RideShare rideDetails = 1;
+}
+
+message TripStartResponse {
+    RideShare rideDetails = 1;
+    bool success = 2;
 }
 
 message Coordinate {

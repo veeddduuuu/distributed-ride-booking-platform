@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.6.2
 // - protoc             v7.35.1
-// source: proto/trip.proto
+// source: trip.proto
 
 package trip
 
@@ -20,6 +20,7 @@ const _ = grpc.SupportPackageIsVersion9
 
 const (
 	TripService_PreviewTrip_FullMethodName = "/trip.TripService/PreviewTrip"
+	TripService_TripStart_FullMethodName   = "/trip.TripService/TripStart"
 )
 
 // TripServiceClient is the client API for TripService service.
@@ -27,6 +28,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type TripServiceClient interface {
 	PreviewTrip(ctx context.Context, in *PreviewTripRequest, opts ...grpc.CallOption) (*PreviewTripResponse, error)
+	TripStart(ctx context.Context, in *TripStartRequest, opts ...grpc.CallOption) (*TripStartResponse, error)
 }
 
 type tripServiceClient struct {
@@ -47,11 +49,22 @@ func (c *tripServiceClient) PreviewTrip(ctx context.Context, in *PreviewTripRequ
 	return out, nil
 }
 
+func (c *tripServiceClient) TripStart(ctx context.Context, in *TripStartRequest, opts ...grpc.CallOption) (*TripStartResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(TripStartResponse)
+	err := c.cc.Invoke(ctx, TripService_TripStart_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // TripServiceServer is the server API for TripService service.
 // All implementations must embed UnimplementedTripServiceServer
 // for forward compatibility.
 type TripServiceServer interface {
 	PreviewTrip(context.Context, *PreviewTripRequest) (*PreviewTripResponse, error)
+	TripStart(context.Context, *TripStartRequest) (*TripStartResponse, error)
 	mustEmbedUnimplementedTripServiceServer()
 }
 
@@ -64,6 +77,9 @@ type UnimplementedTripServiceServer struct{}
 
 func (UnimplementedTripServiceServer) PreviewTrip(context.Context, *PreviewTripRequest) (*PreviewTripResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method PreviewTrip not implemented")
+}
+func (UnimplementedTripServiceServer) TripStart(context.Context, *TripStartRequest) (*TripStartResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method TripStart not implemented")
 }
 func (UnimplementedTripServiceServer) mustEmbedUnimplementedTripServiceServer() {}
 func (UnimplementedTripServiceServer) testEmbeddedByValue()                     {}
@@ -104,6 +120,24 @@ func _TripService_PreviewTrip_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _TripService_TripStart_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(TripStartRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TripServiceServer).TripStart(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TripService_TripStart_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TripServiceServer).TripStart(ctx, req.(*TripStartRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // TripService_ServiceDesc is the grpc.ServiceDesc for TripService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -115,7 +149,11 @@ var TripService_ServiceDesc = grpc.ServiceDesc{
 			MethodName: "PreviewTrip",
 			Handler:    _TripService_PreviewTrip_Handler,
 		},
+		{
+			MethodName: "TripStart",
+			Handler:    _TripService_TripStart_Handler,
+		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "proto/trip.proto",
+	Metadata: "trip.proto",
 }
