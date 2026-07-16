@@ -5,6 +5,7 @@ import (
 
 	"github.com/veeddduuuu/distributed-ride-booking-platform/shared/types"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	// pb "github.com/veeddduuuu/distributed-ride-booking-platform/shared/proto"
 )	
 
 type RideFareModel struct {
@@ -27,5 +28,6 @@ type TripRepository interface {
 
 type TripService interface {
 	CreateTrip(ctx context.Context, fare *RideFareModel) (*TripModel, error)
-	GetRoute(ctx context.Context, pickup, destination *types.Coordinates) (*types.OSRMResponse, error)
+	GetRoute(ctx context.Context, pickup, destination *types.Coordinates) (*types.Route, error)
+	PreviewTrip(ctx context.Context, userId string, pickup *types.Coordinates, destination *types.Coordinates) (*PreviewTripResponse,error)
 }

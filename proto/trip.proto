@@ -6,7 +6,6 @@ option go_package = "shared/proto/trip;trip";
 
 service TripService{
     rpc PreviewTrip(PreviewTripRequest) returns (PreviewTripResponse);
-
 }
 
 message PreviewTripRequest {
