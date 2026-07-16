@@ -76,9 +76,10 @@ func (s *Service) GetFares(userId string, Distance float64) ([]*types.RideShare,
 		slug      string
 		rateperkm float64
 	}{
-		{"moto", 10.0},
-		{"car", 15.0},
-		{"truck", 20.0},
+		{"sedan", 15.0},
+		{"suv", 20.0},
+		{"van", 25.0},
+		{"luxury", 40.0},
 	}
 	// make() is a built-in — it never fails, no error return
 	fares := make([]*types.RideShare, len(packages))
