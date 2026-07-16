@@ -12,7 +12,7 @@ import (
 	"io"
 	"net/http"
 
-	"go.mongodb.org/mongo-driver/bson/primitive"
+	"github.com/google/uuid"
 )
 
 type Service struct {
@@ -27,7 +27,7 @@ func NewService(repo domain.TripRepository) *Service {
 
 func (s *Service) CreateTrip(ctx context.Context, fare domain.RideFareModel) (*domain.TripModel, error) {
 	t := domain.TripModel{
-		ID:       primitive.NewObjectID(),
+		ID:       uuid.New().String(),
 		UserId:   fare.UserId,
 		RideFare: &fare,
 		Status:   "PENDING",
@@ -83,7 +83,7 @@ func (s *Service) GetFares(userId string, distance float64, duration float64) ([
 	}
 	fares := make([]*types.RideShare, len(packages))
 	for i, p := range packages {
-		fareId := primitive.NewObjectID().Hex()
+		fareId := uuid.New().String()
 		fares[i] = &types.RideShare{
 			Id:          fareId,
 			UserId:      userId,
@@ -95,7 +95,7 @@ func (s *Service) GetFares(userId string, distance float64, duration float64) ([
 }
 
 func (s *Service) PreviewTrip(ctx context.Context, userId string, pickup *types.Coordinates, destination *types.Coordinates) (*types.PreviewTripResponse, error) {
-	tripId := primitive.NewObjectID().Hex()
+	tripId := uuid.New().String()
 
 	route, err := s.GetRoute(ctx, pickup, destination)
 	if err != nil {
@@ -112,9 +112,8 @@ func (s *Service) PreviewTrip(ctx context.Context, userId string, pickup *types.
 	// Save fares to the in-memory repository
 	domainFares := make([]*domain.RideFareModel, len(ridefares))
 	for i, f := range ridefares {
-		objID, _ := primitive.ObjectIDFromHex(f.Id)
 		domainFares[i] = &domain.RideFareModel{
-			ID:          objID,
+			ID:          f.Id,
 			TripID:      tripId,
 			UserId:      f.UserId,
 			PackageSlug: f.PackageSlug,

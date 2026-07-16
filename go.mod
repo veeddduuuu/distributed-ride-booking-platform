@@ -3,10 +3,11 @@ module github.com/veeddduuuu/distributed-ride-booking-platform
 go 1.26.4
 
 require (
-	go.mongodb.org/mongo-driver v1.17.9
 	google.golang.org/grpc v1.82.0
 	google.golang.org/protobuf v1.36.11
 )
+
+require github.com/google/uuid v1.6.0
 
 require (
 	github.com/gorilla/websocket v1.5.3

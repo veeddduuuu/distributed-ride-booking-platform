@@ -18,13 +18,13 @@ func NewInmemRepository() *inmemRepository {
 }
 
 func (r *inmemRepository) CreateTrip(ctx context.Context, trip domain.TripModel) (domain.TripModel, error) {
-	r.trips[trip.ID.Hex()] = &trip
+	r.trips[trip.ID] = &trip
 	return trip, nil
 }
 
 func (r *inmemRepository) SaveRideFares(ctx context.Context, fares []*domain.RideFareModel) error {
 	for _, fare := range fares {
-		r.rideFares[fare.ID.Hex()] = fare
+		r.rideFares[fare.ID] = fare
 	}
 	return nil
 }

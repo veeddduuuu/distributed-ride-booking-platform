@@ -4,12 +4,11 @@ import (
 	"context"
 
 	"github.com/veeddduuuu/distributed-ride-booking-platform/shared/types"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	// pb "github.com/veeddduuuu/distributed-ride-booking-platform/shared/proto"
 )
 
 type RideFareModel struct {
-	ID          primitive.ObjectID
+	ID          string
 	TripID      string
 	UserId      string
 	PackageSlug string
@@ -17,7 +16,7 @@ type RideFareModel struct {
 }
 
 type TripModel struct {
-	ID       primitive.ObjectID
+	ID       string
 	UserId   string
 	Status   string
 	RideFare *RideFareModel
