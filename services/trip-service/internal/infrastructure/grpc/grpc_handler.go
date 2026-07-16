@@ -56,26 +56,26 @@ func (h *TripServiceHandler) PreviewTrip(ctx context.Context, req *pb.PreviewTri
 	}, nil
 }
 
-func (h *TripServiceHandler) TripStart(ctx context.Context, req *pb.TripStartRequest) (*pb.TripStartResponse) {
-	ambarsariya:= &types.RideShare{
-		Id: req.RideDetails.Id,
-		UserId: req.RideDetails.UserId,
+func (h *TripServiceHandler) TripStart(ctx context.Context, req *pb.TripStartRequest) (*pb.TripStartResponse, error) {
+	ambarsariya := &types.RideShare{
+		Id:          req.RideDetails.Id,
+		UserId:      req.RideDetails.UserId,
 		PackageSlug: req.RideDetails.PackageSlug,
-		TotalPrice: req.RideDetails.TotalPrice,
+		TotalPrice:  req.RideDetails.TotalPrice,
 	}
-	
+
 	start, err := h.svc.TripStart(ctx, ambarsariya)
-	if err!=nil{
+	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Trip Start Failed: %v", err)
 	}
 
 	return &pb.TripStartResponse{
 		Success: true,
 		RideDetails: &pb.RideShare{
-			Id: start.RideDetails.Id,
-			UserId: start.RideDetails.UserId,
+			Id:          start.RideDetails.Id,
+			UserId:      start.RideDetails.UserId,
 			PackageSlug: start.RideDetails.PackageSlug,
-			TotalPrice: start.RideDetails.TotalPrice,
+			TotalPrice:  start.RideDetails.TotalPrice,
 		},
-	}
+	}, nil
 }
