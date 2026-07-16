@@ -66,3 +66,36 @@ func handleTripPreview(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(resp)
 }
+
+func handleTripStart(w http.ResponseWriter, r *http.Request){
+	var reqBody pb.RideShare
+	
+	if err := json.NewDecoder(r.Body).Decode(&reqBody); err != nil {
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
+
+	// tripId := reqBody.Id
+	// userId := reqBody.UserId
+	// packageSlug := reqBody.PackageSlug
+	// fare := reqBody.Fare
+	
+
+	fmt.Println("Received trip start request, starting your trip with :", reqBody)
+
+	tripservice, err := grpc_clients.NewTripServiceClient()
+	if err != nil {
+		log.Printf("failed to connect to trip service: %v", err)
+		http.Error(w, "Trip service unavailable", http.StatusServiceUnavailable)
+		return
+	}
+
+	defer tripservice.Close()
+
+	//resp, err :=
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(r.Response.StatusCode)
+	//json.NewEncoder(w).Encode(resp) 
+	
+}
