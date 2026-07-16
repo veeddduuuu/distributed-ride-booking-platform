@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
+	"log"
 
 	"github.com/veeddduuuu/distributed-ride-booking-platform/services/trip-service/internal/domain"
 	"github.com/veeddduuuu/distributed-ride-booking-platform/shared/types"
@@ -66,4 +67,50 @@ func (s *Service) GetRoute(ctx context.Context, pickup, destination *types.Coord
 	}
 
 	return route, nil
+}
+
+
+func (s *Service) GetFares(userId string, Distance float64) ([]*types.RideShare, error) {
+	km := Distance / 1000
+	packages := []struct {
+		slug      string
+		rateperkm float64
+	}{
+		{"moto", 10.0},
+		{"car", 15.0},
+		{"truck", 20.0},
+	}
+	// make() is a built-in — it never fails, no error return
+	fares := make([]*types.RideShare, len(packages))
+	for i, p := range packages {
+		fares[i] = &types.RideShare{
+			UserId:      userId,
+			PackageSlug: p.slug,
+			TotalPrice:  km * p.rateperkm,
+		}
+	}
+	return fares, nil
+}
+
+func (s *Service) PreviewTrip(ctx context.Context, userId string, pickup *types.Coordinates, destination *types.Coordinates) (*types.PreviewTripResponse, error) {
+	tripId := primitive.NewObjectID().Hex()
+
+	route, err := s.GetRoute(ctx, pickup, destination)
+	if err != nil {
+		// log it for observability, then return the error to the caller
+		log.Printf("PreviewTrip: failed to get route: %v", err)
+		return nil, fmt.Errorf("failed to get route: %w", err)
+	}
+
+	ridefares, err := s.GetFares(userId, route.Distance)
+	if err != nil {
+		log.Printf("PreviewTrip: failed to get fares: %v", err)
+		return nil, fmt.Errorf("failed to get fares: %w", err)
+	}
+
+	return &types.PreviewTripResponse{
+		TripId:    tripId,
+		Route:     route,
+		RideFares: ridefares,
+	}, nil
 }
