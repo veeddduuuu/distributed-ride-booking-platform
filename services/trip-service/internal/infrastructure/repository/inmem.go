@@ -21,3 +21,18 @@ func (r *inmemRepository) CreateTrip(ctx context.Context, trip domain.TripModel)
 	r.trips[trip.ID.Hex()] = &trip
 	return trip, nil
 }
+
+func (r *inmemRepository) SaveRideFares(ctx context.Context, fares []*domain.RideFareModel) error {
+	for _, fare := range fares {
+		r.rideFares[fare.ID.Hex()] = fare
+	}
+	return nil
+}
+
+func (r *inmemRepository) GetRideFare(ctx context.Context, fareId string) (*domain.RideFareModel, error) {
+	fare, exists := r.rideFares[fareId]
+	if !exists {
+		return nil, context.DeadlineExceeded // Using a dummy error for now, should use a custom not found error
+	}
+	return fare, nil
+}

@@ -69,25 +69,26 @@ func (s *Service) GetRoute(ctx context.Context, pickup, destination *types.Coord
 	return route, nil
 }
 
-
-func (s *Service) GetFares(userId string, Distance float64) ([]*types.RideShare, error) {
-	km := Distance / 1000
+func (s *Service) GetFares(userId string, distance float64, duration float64) ([]*types.RideShare, error) {
 	packages := []struct {
-		slug      string
-		rateperkm float64
+		slug       string
+		rateperkm  float64
+		ratepermin float64
+		bookingfee float64
 	}{
-		{"sedan", 15.0},
-		{"suv", 20.0},
-		{"van", 25.0},
-		{"luxury", 40.0},
+		{"sedan", 15.0, 2.0, 30.0},
+		{"suv", 20.0, 3.0, 50.0},
+		{"van", 25.0, 4.0, 70.0},
+		{"luxury", 40.0, 6.0, 120.0},
 	}
-	// make() is a built-in — it never fails, no error return
 	fares := make([]*types.RideShare, len(packages))
 	for i, p := range packages {
+		fareId := primitive.NewObjectID().Hex()
 		fares[i] = &types.RideShare{
+			Id:          fareId,
 			UserId:      userId,
 			PackageSlug: p.slug,
-			TotalPrice:  km * p.rateperkm,
+			TotalPrice:  distance/1000*p.rateperkm + duration/60*p.ratepermin + p.bookingfee,
 		}
 	}
 	return fares, nil
@@ -98,15 +99,32 @@ func (s *Service) PreviewTrip(ctx context.Context, userId string, pickup *types.
 
 	route, err := s.GetRoute(ctx, pickup, destination)
 	if err != nil {
-		// log it for observability, then return the error to the caller
 		log.Printf("PreviewTrip: failed to get route: %v", err)
 		return nil, fmt.Errorf("failed to get route: %w", err)
 	}
 
-	ridefares, err := s.GetFares(userId, route.Distance)
+	ridefares, err := s.GetFares(userId, route.Distance, route.Duration)
 	if err != nil {
 		log.Printf("PreviewTrip: failed to get fares: %v", err)
 		return nil, fmt.Errorf("failed to get fares: %w", err)
+	}
+
+	// Save fares to the in-memory repository
+	domainFares := make([]*domain.RideFareModel, len(ridefares))
+	for i, f := range ridefares {
+		objID, _ := primitive.ObjectIDFromHex(f.Id)
+		domainFares[i] = &domain.RideFareModel{
+			ID:          objID,
+			TripID:      tripId,
+			UserId:      f.UserId,
+			PackageSlug: f.PackageSlug,
+			TotalPrice:  f.TotalPrice,
+		}
+	}
+
+	if err := s.repo.SaveRideFares(ctx, domainFares); err != nil {
+		log.Printf("PreviewTrip: failed to save fares: %v", err)
+		return nil, fmt.Errorf("failed to save fares: %w", err)
 	}
 
 	return &types.PreviewTripResponse{
@@ -114,4 +132,8 @@ func (s *Service) PreviewTrip(ctx context.Context, userId string, pickup *types.
 		Route:     route,
 		RideFares: ridefares,
 	}, nil
+}
+
+func (s *Service) TripStart(ctx context.Context, rideDetails *types.RideShare) (*types.TripStartResponse, error) {
+	return nil, nil
 }
