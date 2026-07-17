@@ -17,6 +17,7 @@ spec:
       containers:
         - name: trip-service
           image: trip-service:latest
+          imagePullPolicy: Never
           ports:
             - containerPort: 8083
 ---

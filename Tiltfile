@@ -1,15 +1,14 @@
 # --- API Gateway Configuration ---
-local_resource('api-gateway', 
-               cmd='go run ./services/api-gateway', 
-               deps=['services/api-gateway', 'shared'])
+docker_build('api-gateway', '.', dockerfile='services/api-gateway/Dockerfile')
+k8s_yaml('k8s/api-gateway.yaml')
+k8s_resource('api-gateway', port_forwards=8080)
 
 # --- Trip Service Configuration ---
-local_resource('trip-service', 
-               cmd='go run ./services/trip-service/cmd/main.go', 
-               deps=['services/trip-service', 'shared'])
+docker_build('trip-service', '.', dockerfile='services/trip-service/Dockerfile')
+k8s_yaml('k8s/trip-service.yaml')
+k8s_resource('trip-service', port_forwards=8083)
 
 # --- Web Frontend Configuration ---
-local_resource('web', 
-               cmd='npm run dev', 
-               dir='services/web', 
-               deps=['services/web/src', 'services/web/package.json', 'services/web/vite.config.ts'])
+docker_build('web', 'services/web', dockerfile='services/web/Dockerfile')
+k8s_yaml('k8s/web.yaml')
+k8s_resource('web', port_forwards='3000:80')

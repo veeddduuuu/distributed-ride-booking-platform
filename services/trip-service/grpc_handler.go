@@ -38,6 +38,7 @@ func (h *TripServiceHandler) PreviewTrip(ctx context.Context, req *pb.PreviewTri
 	pbFares := make([]*pb.RideShare, len(preview.RideFares))
 	for i, f := range preview.RideFares {
 		pbFares[i] = &pb.RideShare{
+			Id : f.Id,
 			UserId:      f.UserId,
 			PackageSlug: f.PackageSlug,
 			TotalPrice:  f.TotalPrice,

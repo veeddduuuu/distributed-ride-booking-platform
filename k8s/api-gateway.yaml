@@ -17,6 +17,10 @@ spec:
       containers:
         - name: api-gateway
           image: api-gateway:latest
+          imagePullPolicy: Never
+          env:
+            - name: TRIP_SERVICE_URL
+              value: "trip-service:8083"
           ports:
             - containerPort: 8080
 ---

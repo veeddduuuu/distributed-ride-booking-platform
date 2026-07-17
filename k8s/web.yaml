@@ -17,6 +17,7 @@ spec:
       containers:
         - name: web
           image: web:latest
+          imagePullPolicy: Never
           ports:
             - containerPort: 80
 ---

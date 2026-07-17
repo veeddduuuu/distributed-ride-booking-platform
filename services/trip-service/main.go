@@ -24,7 +24,7 @@ type PreviewRequest struct {
 	Destination types.Coordinates `json:"destination"`
 }
 
-var grpcAddr = ":9093"
+var grpcAddr = ":8083"
 
 func main() {
 	inmemrepo := NewInmemRepository()
