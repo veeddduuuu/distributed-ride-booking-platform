@@ -11,6 +11,7 @@ type TripPreviewRequest struct {
 	Destination Coordinates `json:"destination"`
 }
 
-
-
+type CreateTripRequest struct {
+	FareId string `json:"fareId"`
+}
 

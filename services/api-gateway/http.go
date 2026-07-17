@@ -67,22 +67,18 @@ func handleTripPreview(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(resp)
 }
 
-func handleTripStart(w http.ResponseWriter, r *http.Request) {
-	var reqBody pb.RideShare
+func handleCreateTrip (w http.ResponseWriter, r *http.Request) {
+
+	var reqBody CreateTripRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&reqBody); err != nil {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
 
-	// tripId := reqBody.Id
-	// userId := reqBody.UserId
-	// packageSlug := reqBody.PackageSlug
-	// fare := reqBody.Fare
+	fmt.Println("Received create trip request: ", reqBody)
 
-	fmt.Println("Received trip start request, starting your trip with :", reqBody)
-
-	tripservice, err := grpc_clients.NewTripServiceClient()
+	tripservice, err := grpc_clients.NewTripServiceClient()	
 	if err != nil {
 		log.Printf("failed to connect to trip service: %v", err)
 		http.Error(w, "Trip service unavailable", http.StatusServiceUnavailable)
@@ -91,13 +87,8 @@ func handleTripStart(w http.ResponseWriter, r *http.Request) {
 
 	defer tripservice.Close()
 
-	resp, err := tripservice.Client.TripStart(r.Context(), &pb.TripStartRequest{
-		RideDetails: &pb.RideShare{
-			Id:          reqBody.Id,
-			UserId:      reqBody.UserId,
-			PackageSlug: reqBody.PackageSlug,
-			TotalPrice:  reqBody.TotalPrice,
-		},
+	resp, err := tripservice.Client.CreateTrip(r.Context(), &pb.CreateTripRequest{
+		FareId: reqBody.FareId,
 	})
 
 	if err != nil {
