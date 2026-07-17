@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package driver;
+
+option go_package = "shared/proto/driver;driver";
+
+service DriverService{
+    rpc RegisterDriver(RegisterRequest) returns {RegisterResponse}
+    rpc RegisterDriver(UnregisterRequest) returns {UnregisterResponse}
+    
+}
+
+message RegisterRequest{
+    string driverId = 1;
+    string packageSlug = 2;
+}
+
+message RegisterResponse{
+    Driver driver = 1;
+}
+
+message Driver{
+    
+}
+
+message UnregisterRequest{
+
+}
+
+message UnregisterResponse{
+
+}

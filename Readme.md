@@ -9,7 +9,7 @@ The platform simulates the core workflows of an Uber-like application, orchestra
 - **Message Broker:** RabbitMQ (for event-driven communication)
 - **APIs & Protocols:** HTTP/REST, gRPC, WebSockets (for real-time updates)
 - **Telemetry:** OpenTelemetry & Jaeger (Distributed Tracing)
-- **Deployment & Orchestration:** Docker, Kubernetes (K8s), and Tilt for local development
+- **Deployment & Orchestration:** Docker and Docker Compose
 
 ---
 
