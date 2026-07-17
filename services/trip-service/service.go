@@ -29,7 +29,7 @@ func (s *Service) CreateTrip(ctx context.Context, fareId string) (*TripModel, er
 	if err!=nil{
 		return nil, fmt.Errorf("Faiiled to get fare model from repo %v", err)
 	}
-	trip, err := &TripModel{
+	trip := TripModel{
 		ID: fare.ID,
 		UserId: fare.UserId,
 		Status: "PENDING",
@@ -40,10 +40,6 @@ func (s *Service) CreateTrip(ctx context.Context, fareId string) (*TripModel, er
 			PackageSlug: fare.PackageSlug,
 			TotalPrice: fare.TotalPrice,
 		},
-	}
-
-	if err!=nil{
-		return nil, fmt.Errorf("Unable to build Trip Model %v", err)
 	}
 
 	createdTrip, err := s.repo.CreateTrip(ctx, trip)
