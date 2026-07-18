@@ -13,6 +13,7 @@ service DriverService{
 message RegisterRequest{
     string driverId = 1;
     string packageSlug = 2;
+    Coordinate location = 3;
 }
 
 message RegisterResponse{
@@ -25,6 +26,12 @@ message Driver{
     string carNumber = 3;
     string profilePicture = 4;
     string packageSlug = 5;
+    Coordinate location = 6;
+}
+
+message Coordinate {
+    double latitude = 1;
+    double longitude = 2;
 }
 
 message UnregisterRequest{

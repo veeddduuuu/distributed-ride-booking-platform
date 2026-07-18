@@ -25,6 +25,7 @@ type RegisterRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	DriverId      string                 `protobuf:"bytes,1,opt,name=driverId,proto3" json:"driverId,omitempty"`
 	PackageSlug   string                 `protobuf:"bytes,2,opt,name=packageSlug,proto3" json:"packageSlug,omitempty"`
+	Location      *Coordinate            `protobuf:"bytes,3,opt,name=location,proto3" json:"location,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -71,6 +72,13 @@ func (x *RegisterRequest) GetPackageSlug() string {
 		return x.PackageSlug
 	}
 	return ""
+}
+
+func (x *RegisterRequest) GetLocation() *Coordinate {
+	if x != nil {
+		return x.Location
+	}
+	return nil
 }
 
 type RegisterResponse struct {
@@ -124,6 +132,7 @@ type Driver struct {
 	CarNumber      string                 `protobuf:"bytes,3,opt,name=carNumber,proto3" json:"carNumber,omitempty"`
 	ProfilePicture string                 `protobuf:"bytes,4,opt,name=profilePicture,proto3" json:"profilePicture,omitempty"`
 	PackageSlug    string                 `protobuf:"bytes,5,opt,name=packageSlug,proto3" json:"packageSlug,omitempty"`
+	Location       *Coordinate            `protobuf:"bytes,6,opt,name=location,proto3" json:"location,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -193,6 +202,65 @@ func (x *Driver) GetPackageSlug() string {
 	return ""
 }
 
+func (x *Driver) GetLocation() *Coordinate {
+	if x != nil {
+		return x.Location
+	}
+	return nil
+}
+
+type Coordinate struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Latitude      float64                `protobuf:"fixed64,1,opt,name=latitude,proto3" json:"latitude,omitempty"`
+	Longitude     float64                `protobuf:"fixed64,2,opt,name=longitude,proto3" json:"longitude,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Coordinate) Reset() {
+	*x = Coordinate{}
+	mi := &file_driver_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Coordinate) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Coordinate) ProtoMessage() {}
+
+func (x *Coordinate) ProtoReflect() protoreflect.Message {
+	mi := &file_driver_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Coordinate.ProtoReflect.Descriptor instead.
+func (*Coordinate) Descriptor() ([]byte, []int) {
+	return file_driver_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *Coordinate) GetLatitude() float64 {
+	if x != nil {
+		return x.Latitude
+	}
+	return 0
+}
+
+func (x *Coordinate) GetLongitude() float64 {
+	if x != nil {
+		return x.Longitude
+	}
+	return 0
+}
+
 type UnregisterRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	DriverId      string                 `protobuf:"bytes,1,opt,name=driverId,proto3" json:"driverId,omitempty"`
@@ -202,7 +270,7 @@ type UnregisterRequest struct {
 
 func (x *UnregisterRequest) Reset() {
 	*x = UnregisterRequest{}
-	mi := &file_driver_proto_msgTypes[3]
+	mi := &file_driver_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -214,7 +282,7 @@ func (x *UnregisterRequest) String() string {
 func (*UnregisterRequest) ProtoMessage() {}
 
 func (x *UnregisterRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_driver_proto_msgTypes[3]
+	mi := &file_driver_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -227,7 +295,7 @@ func (x *UnregisterRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UnregisterRequest.ProtoReflect.Descriptor instead.
 func (*UnregisterRequest) Descriptor() ([]byte, []int) {
-	return file_driver_proto_rawDescGZIP(), []int{3}
+	return file_driver_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *UnregisterRequest) GetDriverId() string {
@@ -246,7 +314,7 @@ type UnregisterResponse struct {
 
 func (x *UnregisterResponse) Reset() {
 	*x = UnregisterResponse{}
-	mi := &file_driver_proto_msgTypes[4]
+	mi := &file_driver_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -258,7 +326,7 @@ func (x *UnregisterResponse) String() string {
 func (*UnregisterResponse) ProtoMessage() {}
 
 func (x *UnregisterResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_driver_proto_msgTypes[4]
+	mi := &file_driver_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -271,7 +339,7 @@ func (x *UnregisterResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UnregisterResponse.ProtoReflect.Descriptor instead.
 func (*UnregisterResponse) Descriptor() ([]byte, []int) {
-	return file_driver_proto_rawDescGZIP(), []int{4}
+	return file_driver_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *UnregisterResponse) GetDriver() *Driver {
@@ -285,18 +353,24 @@ var File_driver_proto protoreflect.FileDescriptor
 
 const file_driver_proto_rawDesc = "" +
 	"\n" +
-	"\fdriver.proto\x12\x06driver\"O\n" +
+	"\fdriver.proto\x12\x06driver\"\x7f\n" +
 	"\x0fRegisterRequest\x12\x1a\n" +
 	"\bdriverId\x18\x01 \x01(\tR\bdriverId\x12 \n" +
-	"\vpackageSlug\x18\x02 \x01(\tR\vpackageSlug\":\n" +
+	"\vpackageSlug\x18\x02 \x01(\tR\vpackageSlug\x12.\n" +
+	"\blocation\x18\x03 \x01(\v2\x12.driver.CoordinateR\blocation\":\n" +
 	"\x10RegisterResponse\x12&\n" +
-	"\x06driver\x18\x01 \x01(\v2\x0e.driver.DriverR\x06driver\"\x9c\x01\n" +
+	"\x06driver\x18\x01 \x01(\v2\x0e.driver.DriverR\x06driver\"\xcc\x01\n" +
 	"\x06Driver\x12\x16\n" +
 	"\x06userId\x18\x01 \x01(\tR\x06userId\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x1c\n" +
 	"\tcarNumber\x18\x03 \x01(\tR\tcarNumber\x12&\n" +
 	"\x0eprofilePicture\x18\x04 \x01(\tR\x0eprofilePicture\x12 \n" +
-	"\vpackageSlug\x18\x05 \x01(\tR\vpackageSlug\"/\n" +
+	"\vpackageSlug\x18\x05 \x01(\tR\vpackageSlug\x12.\n" +
+	"\blocation\x18\x06 \x01(\v2\x12.driver.CoordinateR\blocation\"F\n" +
+	"\n" +
+	"Coordinate\x12\x1a\n" +
+	"\blatitude\x18\x01 \x01(\x01R\blatitude\x12\x1c\n" +
+	"\tlongitude\x18\x02 \x01(\x01R\tlongitude\"/\n" +
 	"\x11UnregisterRequest\x12\x1a\n" +
 	"\bdriverId\x18\x01 \x01(\tR\bdriverId\"<\n" +
 	"\x12UnregisterResponse\x12&\n" +
@@ -317,26 +391,29 @@ func file_driver_proto_rawDescGZIP() []byte {
 	return file_driver_proto_rawDescData
 }
 
-var file_driver_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
+var file_driver_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_driver_proto_goTypes = []any{
 	(*RegisterRequest)(nil),    // 0: driver.RegisterRequest
 	(*RegisterResponse)(nil),   // 1: driver.RegisterResponse
 	(*Driver)(nil),             // 2: driver.Driver
-	(*UnregisterRequest)(nil),  // 3: driver.UnregisterRequest
-	(*UnregisterResponse)(nil), // 4: driver.UnregisterResponse
+	(*Coordinate)(nil),         // 3: driver.Coordinate
+	(*UnregisterRequest)(nil),  // 4: driver.UnregisterRequest
+	(*UnregisterResponse)(nil), // 5: driver.UnregisterResponse
 }
 var file_driver_proto_depIdxs = []int32{
-	2, // 0: driver.RegisterResponse.driver:type_name -> driver.Driver
-	2, // 1: driver.UnregisterResponse.driver:type_name -> driver.Driver
-	0, // 2: driver.DriverService.RegisterDriver:input_type -> driver.RegisterRequest
-	3, // 3: driver.DriverService.UnregisterDriver:input_type -> driver.UnregisterRequest
-	1, // 4: driver.DriverService.RegisterDriver:output_type -> driver.RegisterResponse
-	4, // 5: driver.DriverService.UnregisterDriver:output_type -> driver.UnregisterResponse
-	4, // [4:6] is the sub-list for method output_type
-	2, // [2:4] is the sub-list for method input_type
-	2, // [2:2] is the sub-list for extension type_name
-	2, // [2:2] is the sub-list for extension extendee
-	0, // [0:2] is the sub-list for field type_name
+	3, // 0: driver.RegisterRequest.location:type_name -> driver.Coordinate
+	2, // 1: driver.RegisterResponse.driver:type_name -> driver.Driver
+	3, // 2: driver.Driver.location:type_name -> driver.Coordinate
+	2, // 3: driver.UnregisterResponse.driver:type_name -> driver.Driver
+	0, // 4: driver.DriverService.RegisterDriver:input_type -> driver.RegisterRequest
+	4, // 5: driver.DriverService.UnregisterDriver:input_type -> driver.UnregisterRequest
+	1, // 6: driver.DriverService.RegisterDriver:output_type -> driver.RegisterResponse
+	5, // 7: driver.DriverService.UnregisterDriver:output_type -> driver.UnregisterResponse
+	6, // [6:8] is the sub-list for method output_type
+	4, // [4:6] is the sub-list for method input_type
+	4, // [4:4] is the sub-list for extension type_name
+	4, // [4:4] is the sub-list for extension extendee
+	0, // [0:4] is the sub-list for field type_name
 }
 
 func init() { file_driver_proto_init() }
@@ -350,7 +427,7 @@ func file_driver_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_driver_proto_rawDesc), len(file_driver_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   5,
+			NumMessages:   6,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
