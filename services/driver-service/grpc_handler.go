@@ -13,8 +13,8 @@ type DriverServiceHandler struct{
 	svc DriverService
 }
 
-func NewDriverService(svc DriverService)(*DriverServiceHandler){
-	return &DriverServiceHandler{svc : svc}
+func NewDriverServiceHandler(svc DriverService) *DriverServiceHandler {
+	return &DriverServiceHandler{svc: svc}
 }
 
 func (h *DriverServiceHandler) RegisterDriver(ctx context.Context, req *pb.RegisterRequest) (*pb.RegisterResponse, error) {
