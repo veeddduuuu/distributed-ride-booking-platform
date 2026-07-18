@@ -1,4 +1,4 @@
-package driverservice
+package main
 
 import (
 	"context"
