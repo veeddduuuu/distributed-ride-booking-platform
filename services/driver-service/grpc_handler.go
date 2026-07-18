@@ -18,10 +18,39 @@ func NewDriverService(svc DriverService)(*DriverServiceHandler){
 }
 
 func (h *DriverServiceHandler) RegisterDriver(ctx context.Context, req *pb.RegisterRequest) (*pb.RegisterResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method RegisterDriver not implemented")
+	driverId:=req.DriverId
+	packageSlug:=req.PackageSlug
+	driver, err:= h.svc.RegisterDriver(ctx, driverId, packageSlug)
+	if err!=nil {
+		return nil, status.Errorf(codes.Internal, "Could not register driver: %v", err)
+	}
+	return &pb.RegisterResponse{
+		Driver: &pb.Driver{
+			UserId: driver.UserId,
+			Name: driver.Name,
+			CarNumber: driver.CarNumber,
+			ProfilePicture: driver.ProfilePicture,
+			PackageSlug: driver.PackageSlug,
+		},
+	}, nil
+	// return nil, status.Error(codes.Unimplemented, "method RegisterDriver not implemented")
 
 }
 
 func (h *DriverServiceHandler) UnregisterDriver(ctx context.Context, req *pb.UnregisterRequest) (*pb.UnregisterResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method UnregisterDriver not implemented")
+	driverId:=req.DriverId
+	driver, err:= h.svc.UnregisterDriver(ctx, driverId)
+	if err!=nil {
+		return nil, status.Errorf(codes.Internal, "Could not unregister driver: %v", err)
+	}
+	return &pb.UnregisterResponse{
+		Driver: &pb.Driver{
+			UserId: driver.UserId,
+			Name: driver.Name,
+			CarNumber: driver.CarNumber,
+			ProfilePicture: driver.ProfilePicture,
+			PackageSlug: driver.PackageSlug,
+		},
+	}, nil
+	// return nil, status.Error(codes.Unimplemented, "method UnregisterDriver not implemented")
 }

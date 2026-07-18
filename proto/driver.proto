@@ -20,7 +20,7 @@ message RegisterResponse{
 }
 
 message Driver{
-    string userID = 1;
+    string userId = 1;
     string name = 2;
     string carNumber = 3;
     string profilePicture = 4;

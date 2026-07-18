@@ -119,7 +119,7 @@ func (x *RegisterResponse) GetDriver() *Driver {
 
 type Driver struct {
 	state          protoimpl.MessageState `protogen:"open.v1"`
-	UserID         string                 `protobuf:"bytes,1,opt,name=userID,proto3" json:"userID,omitempty"`
+	UserId         string                 `protobuf:"bytes,1,opt,name=userId,proto3" json:"userId,omitempty"`
 	Name           string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	CarNumber      string                 `protobuf:"bytes,3,opt,name=carNumber,proto3" json:"carNumber,omitempty"`
 	ProfilePicture string                 `protobuf:"bytes,4,opt,name=profilePicture,proto3" json:"profilePicture,omitempty"`
@@ -158,9 +158,9 @@ func (*Driver) Descriptor() ([]byte, []int) {
 	return file_driver_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *Driver) GetUserID() string {
+func (x *Driver) GetUserId() string {
 	if x != nil {
-		return x.UserID
+		return x.UserId
 	}
 	return ""
 }
@@ -292,7 +292,7 @@ const file_driver_proto_rawDesc = "" +
 	"\x10RegisterResponse\x12&\n" +
 	"\x06driver\x18\x01 \x01(\v2\x0e.driver.DriverR\x06driver\"\x9c\x01\n" +
 	"\x06Driver\x12\x16\n" +
-	"\x06userID\x18\x01 \x01(\tR\x06userID\x12\x12\n" +
+	"\x06userId\x18\x01 \x01(\tR\x06userId\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x1c\n" +
 	"\tcarNumber\x18\x03 \x01(\tR\tcarNumber\x12&\n" +
 	"\x0eprofilePicture\x18\x04 \x01(\tR\x0eprofilePicture\x12 \n" +
