@@ -20,6 +20,8 @@ func main() {
 
 	mux.HandleFunc("POST /trip/preview", enableCORS(handleTripPreview))
 	mux.HandleFunc("POST /trip/create", enableCORS(handleCreateTrip))
+	mux.HandleFunc("POST /driver/register", enableCORS(handleRegisterDriver))
+	mux.HandleFunc("POST /driver/unregister", enableCORS(handleUnregisterDriver))
 	mux.HandleFunc("/ws/rider", handleRiderWebSocket)
 	mux.HandleFunc("/ws/driver", handleDriverWebSocket)
 
