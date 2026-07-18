@@ -5,14 +5,15 @@ package driver;
 option go_package = "shared/proto/driver;driver";
 
 service DriverService{
-    rpc RegisterDriver(RegisterRequest) returns {RegisterResponse}
-    rpc RegisterDriver(UnregisterRequest) returns {UnregisterResponse}
+    rpc RegisterDriver(RegisterRequest) returns (RegisterResponse);
+    rpc UnregisterDriver(UnregisterRequest) returns (UnregisterResponse);
     
 }
 
 message RegisterRequest{
     string driverId = 1;
     string packageSlug = 2;
+    Coordinate location = 3;
 }
 
 message RegisterResponse{
@@ -20,13 +21,23 @@ message RegisterResponse{
 }
 
 message Driver{
-    
+    string userId = 1;
+    string name = 2;
+    string carNumber = 3;
+    string profilePicture = 4;
+    string packageSlug = 5;
+    Coordinate location = 6;
+}
+
+message Coordinate {
+    double latitude = 1;
+    double longitude = 2;
 }
 
 message UnregisterRequest{
-
+    string driverId = 1;
 }
 
 message UnregisterResponse{
-
+    Driver driver = 1;   
 }
